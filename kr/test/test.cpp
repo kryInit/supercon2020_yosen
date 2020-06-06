@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
             string ith_cmd = "./" + cmd + " < " + filename_in[i] + " > " + filename_out[i];
             cout << " > " << ith_cmd << endl;
             system(ith_cmd.c_str());
-            cout << "   ---- checking... ----" << endl;
+            cout << "checking..." << endl;
             long long cost = 0;
             cost = checkAndCalcCost(filename_in[i], filename_out[i]);
             if (cost == -1) {
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
                 continue;
             }
             else cout << "OK!\ncost: " << cost << endl;
-            cout << "   ---- finished! ----" << endl;
+            cout << "finished!\n" << endl;
             sum_cost += cost;
         }
         cout << "sum cost: " << sum_cost << endl;
