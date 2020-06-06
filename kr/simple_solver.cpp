@@ -40,7 +40,6 @@ void output(int yn, int n, struct procedure *c) {
     fflush(stdout);
 }
 
-// ここまでコピペ //
 
 const int TYPE1 = 1;
 const int TYPE2 = 2;
@@ -49,26 +48,28 @@ const int MAX_T = 100000;
 const int MAX_S = 200000;
 const int MAX_N = 500000;
 
-bool is_NO_case(string s, string t);
+bool isNoCase(string s, string t);
 void check(string s, string t, int n, procedure *c);
-void simply_solve(string s, string t, int& n, procedure *c);
+void simplySolve(string s, string t, int& n, procedure *c);
+
 
 procedure proc[MAX_N];
 
 int main() {
     string s,t;
     cin >> s >> t;
-    if(is_NO_case(s,t)) {
+    if(isNoCase(s,t)) {
         output(0,0,NULL);
         return 0;
     }
     int n=0;
-    simply_solve(s,t,n,proc);
+    simplySolve(s,t,n,proc);
 //    check(s,t,n,proc);
     output(1,n,proc);
 }
 
-void simply_solve(string s, string t, int& n, procedure *c) {
+void simplySolve(string s, string t, int& n, procedure *c) {
+    vector<procedure> v;
     int scnt[A2Z_NUM]={}, tcnt[A2Z_NUM]={};
     for(auto i : s) scnt[i-'a']++;
     for(auto i : t) tcnt[i-'a']++;
@@ -86,7 +87,6 @@ void simply_solve(string s, string t, int& n, procedure *c) {
             dp[j][A2Z_NUM] = 1;
         }
     }
-    vector<procedure> v;
     string S[26];
     for(int i=0; i<A2Z_NUM; ++i) S[i].push_back((char)(i+'a'));
     for(int i=0; i<A2Z_NUM; ++i) {
@@ -108,7 +108,7 @@ void simply_solve(string s, string t, int& n, procedure *c) {
         s = tmps;
     }
     map<char,priority_queue<int,vector<int>,greater<int>>> m;
-    for(int i=0; i<s.size(); ++i) m[(s[i]^32)].push(i);
+    for(int i=0; i<s.size(); ++i) m[(s[i]|32)].push(i);
     for(int i=0; i<t.size(); ++i) {
         while(m[t[i]].top() < i) m[t[i]].pop();
         if (m[t[i]].top() > i) {
@@ -117,23 +117,23 @@ void simply_solve(string s, string t, int& n, procedure *c) {
             tmp.init_type2(I+1,J+1);
             v.push_back(tmp);
             swap(s[I], s[J]);
-            m[(s[J]^32)].push(J);
+            m[(s[J]|32)].push(J);
         }
         m[t[i]].pop();
     }
     for(int i=0; i<A2Z_NUM; ++i) if (tcnt[i]) {
-        procedure tmp;
-        string tmps;
-        tmps.push_back((char)(i+'A'));
-        tmps.push_back((char)(i+'a'));
-        tmp.init_type1(tmps);
-        v.push_back(tmp);
-    }
+            procedure tmp;
+            string tmps;
+            tmps.push_back((char)(i+'A'));
+            tmps.push_back((char)(i+'a'));
+            tmp.init_type1(tmps);
+            v.push_back(tmp);
+        }
     n = v.size();
     for(int i=0; i<n; ++i) *(c+i) = v[i];
 }
 
-bool is_NO_case(string s, string t) {
+bool isNoCase(string s, string t) {
     int scnt[A2Z_NUM] = {};
     for(auto i : s) scnt[i-'a']++;
 
