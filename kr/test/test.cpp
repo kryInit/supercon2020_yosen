@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     long long min_cost = LONG_LONG_MAX;
 
     for(int k=1; k<argc; ++k) {
-        string cmd = string(argv[1]);
+        string cmd = string(argv[k]);
         long long sum_cost = 0;
         
         cout << cmd << " is started!" << endl;
