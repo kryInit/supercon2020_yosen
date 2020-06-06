@@ -33,6 +33,8 @@ int main(int argc, char *argv[]) {
     int idx_min_cost_cmd = 0;
     long long min_cost = LONG_LONG_MAX;
 
+    long long *_cost = new long long[argc];
+
     for(int k=1; k<argc; ++k) {
         string cmd = string(argv[k]);
         long long sum_cost = 0;
@@ -48,6 +50,7 @@ int main(int argc, char *argv[]) {
             cost = checkAndCalcCost(filename_in[i], filename_out[i]);
             if (cost == -1) {
                 cout << "we have a bad news...\n your proguram is something wrong." << endl;
+                _cost[k] = -1;
                 continue;
             }
             else cout << "OK!\ncost: " << cost << endl;
@@ -60,14 +63,24 @@ int main(int argc, char *argv[]) {
             min_cost = sum_cost;
             idx_min_cost_cmd = k;
         }
+        _cost[k] = sum_cost;
     }
     if (idx_min_cost_cmd == 0) {
         cout << "all proguram is something wrong..." << endl;
     }
     else {
+        for(int k=1; k<argc; ++k) {
+            if (_cost[k] != -1) {
+                cout << setw(16) << setfill('-') << string(argv[k]) << "'s cost: ";
+                cout << _cost[k] << endl;
+            }
+        }
+        cout << endl;
+
         cout << "minimum cost command is " + string(argv[idx_min_cost_cmd]) << endl;
         cout << "cost: " << min_cost << endl;
     }
+    delete _cost;
 }
 
 const int MAX_N = 500000;
