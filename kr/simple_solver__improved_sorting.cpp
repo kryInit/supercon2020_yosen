@@ -51,81 +51,14 @@ const int MAX_N = 500000;
 bool isNoCase(string s, string t);
 void check(string s, string t, int n, procedure *c);
 void simplySolve(string s, string t, int& n, procedure *c);
-vector<procedure> getSortingProcedure(string &s) {
-    vector<procedure> result;
-    priority_queue<int, vector<int>, greater<int>> next_idx[A2Z_NUM];
-    string t = s; sort(t.begin(), t.end());
-    int end_point[A2Z_NUM] = {};
-    for(int i=0; i<s.size(); ++i) next_idx[tolower(s[i])-'a'].push(i);
-    for(int i=0; i<A2Z_NUM; ++i) end_point[i] = next_idx[i].size() + (i ? end_point[i-1] : -1);
-    for(int i=0; i<s.size(); ++i) {
-        char si = tolower(s[i]), ti = tolower(t[i]);
-        if (ti == si) {
-            next_idx[si-'a'].pop();
-            continue;
-        }
-        int j = next_idx[ti-'a'].top();
-        char sj = tolower(s[j]), tj = tolower(t[j]);
-        if (si >= tj) {
-            swap(s[i], s[j]);
-            procedure tmp;
-            tmp.init_type2(i+1,j+1);
-            result.push_back(tmp);
-            next_idx[si-'a'].pop();
-            next_idx[sj-'a'].pop();
-            next_idx[si-'a'].push(j);
-        } else {
-            bool found = false;
-            for(int k=end_point[si-'a']; k>i; --k) {
-                int sk = tolower(s[k]);
-                if (sk >= tj) {
-                    found = true;
-                    swap(s[k], s[j]);
-                    swap(s[i], s[k]);
-                    procedure tmp;
-                    tmp.init_type2(k+1,j+1);
-                    result.push_back(tmp);
-                    tmp.init_type2(i+1,k+1);
-                    result.push_back(tmp);
-                    next_idx[si-'a'].pop();
-                    next_idx[sk-'a'].pop();
-                    next_idx[sj-'a'].pop();
-                    next_idx[si-'a'].push(k);
-                    next_idx[sk-'a'].push(j);
-                    break;
-                }
-            }
-            if (!found) {
-                swap(s[i], s[j]);
-                procedure tmp;
-                tmp.init_type2(i+1,j+1);
-                result.push_back(tmp);
-                next_idx[si-'a'].pop();
-                next_idx[sj-'a'].pop();
-                next_idx[si-'a'].push(j);
-            }
-        }
-    }
-    return result;
-}
+vector<procedure> getSortingProcedure(string s);
+vector<procedure> lsort(string s);
+vector<procedure> rsort(string s);
 
 
 procedure proc[MAX_N];
 
 int main() {
-
-//    string _s;
-//    cin >> _s;
-//    vector<procedure> v = getSortingProcedure(_s);
-//    cout << _s << endl;
-//    for(auto i : v) {
-//        if (i.type == 1) cout << 1 << " " << i.S << endl;
-//        else cout << 2 << " " << i.i << " " << i.j << endl;
-//
-//    }
-//    return 0;
-
-
     string s,t;
     cin >> s >> t;
     if(isNoCase(s,t)) {
@@ -180,6 +113,7 @@ void simplySolve(string s, string t, int& n, procedure *c) {
     {
         vector<procedure> tmpv = getSortingProcedure(s);
         for(auto i : tmpv) v.push_back(i);
+        sort(s.begin(), s.end(), [](char l, char r){ return tolower(l) < tolower(r); });
     }
     for(int i=0; i<A2Z_NUM; ++i) if (tcnt[i]) {
             procedure tmp;
@@ -192,6 +126,133 @@ void simplySolve(string s, string t, int& n, procedure *c) {
     n = v.size();
     for(int i=0; i<n; ++i) *(c+i) = v[i];
 }
+
+vector<procedure> getSortingProcedure(string s) {
+    vector<procedure> lv,rv;
+    lv = lsort(s);
+    rv = rsort(s);
+    int lcost=0, rcost=0;
+    for(auto i : lv) lcost += i.j-i.i;
+    for(auto i : rv) rcost += i.j-i.i;
+    if (lcost == rcost) return (lv.size() < rv.size() ? lv : rv);
+    else return (lcost < rcost ? lv : rv);
+}
+
+vector<procedure> lsort(string s) {
+    vector<procedure> result;
+    priority_queue<int, vector<int>, greater<int>> next_idx[A2Z_NUM];
+    string t = s; sort(t.begin(), t.end(), [](char l, char r){ return tolower(l) < tolower(r); });
+    int end_point[A2Z_NUM] = {};
+    for(int i=0; i<s.size(); ++i) next_idx[tolower(s[i])-'a'].push(i);
+    for(int i=0; i<A2Z_NUM; ++i) end_point[i] = next_idx[i].size() + (i ? end_point[i-1] : -1);
+    for(int i=0; i<s.size(); ++i) {
+        char si = tolower(s[i]), ti = tolower(t[i]);
+        if (ti == si) {
+            next_idx[si-'a'].pop();
+            continue;
+        }
+        int j = next_idx[ti-'a'].top();
+        char sj = tolower(s[j]), tj = tolower(t[j]);
+        if (si >= tj) {
+            swap(s[i], s[j]);
+            procedure tmp;
+            tmp.init_type2(i+1,j+1);
+            result.push_back(tmp);
+            next_idx[si-'a'].pop();
+            next_idx[sj-'a'].pop();
+            next_idx[si-'a'].push(j);
+        } else {
+            bool found = false;
+            for(int k=end_point[si-'a']; k>i; --k) {
+                int sk = tolower(s[k]);
+                if (sk >= tj) {
+                    found = true;
+                    swap(s[k], s[j]);
+                    swap(s[i], s[k]);
+                    procedure tmp;
+                    tmp.init_type2(k+1,j+1);
+                    result.push_back(tmp);
+                    tmp.init_type2(i+1,k+1);
+                    result.push_back(tmp);
+                    next_idx[si-'a'].pop();
+                    next_idx[sk-'a'].pop();
+                    next_idx[sj-'a'].pop();
+                    next_idx[si-'a'].push(k);
+                    next_idx[sk-'a'].push(j);
+                    break;
+                }
+            }
+            if (!found) {
+                swap(s[i], s[j]);
+                procedure tmp;
+                tmp.init_type2(i+1,j+1);
+                result.push_back(tmp);
+                next_idx[si-'a'].pop();
+                next_idx[sj-'a'].pop();
+                next_idx[si-'a'].push(j);
+            }
+        }
+    }
+    return result;
+}
+vector<procedure> rsort(string s) {
+    vector<procedure> result;
+    priority_queue<int> prev_idx[A2Z_NUM];
+    string t = s; sort(t.begin(), t.end(), [](char l, char r){ return tolower(l) < tolower(r); });
+    int start_point[A2Z_NUM] = {};
+    for(int i=0; i<s.size(); ++i) prev_idx[tolower(s[i])-'a'].push(i);
+    for(int i=1; i<A2Z_NUM; ++i) start_point[i] = start_point[i-1] + prev_idx[i-1].size();
+    for(int j=s.size()-1; j>=0; --j) {
+        char sj = tolower(s[j]), tj = tolower(t[j]);
+        if (tj == sj) {
+            prev_idx[sj-'a'].pop();
+            continue;
+        }
+        int i = prev_idx[tj-'a'].top();
+        char si = tolower(s[i]), ti = tolower(t[i]);
+        if (ti >= sj) {
+            swap(s[i], s[j]);
+            procedure tmp;
+            tmp.init_type2(i+1,j+1);
+            result.push_back(tmp);
+            prev_idx[si-'a'].pop();
+            prev_idx[sj-'a'].pop();
+            prev_idx[sj-'a'].push(i);
+        } else {
+            bool found = false;
+            for(int k=start_point[sj-'a']; k<j; ++k) {
+                int sk = tolower(s[k]);
+                if (ti >= sk) {
+                    found = true;
+                    swap(s[i], s[k]);
+                    swap(s[k], s[j]);
+                    procedure tmp;
+                    tmp.init_type2(i+1,k+1);
+                    result.push_back(tmp);
+                    tmp.init_type2(k+1,j+1);
+                    result.push_back(tmp);
+                    prev_idx[si-'a'].pop();
+                    prev_idx[sk-'a'].pop();
+                    prev_idx[sj-'a'].pop();
+                    prev_idx[sj-'a'].push(k);
+                    prev_idx[sk-'a'].push(i);
+                    break;
+                }
+            }
+            if (!found) {
+                swap(s[i], s[j]);
+                procedure tmp;
+                tmp.init_type2(i+1,j+1);
+                result.push_back(tmp);
+                prev_idx[si-'a'].pop();
+                prev_idx[sj-'a'].pop();
+                prev_idx[sj-'a'].push(i);
+            }
+        }
+    }
+    return result;
+}
+
 
 bool isNoCase(string s, string t) {
     int scnt[A2Z_NUM] = {};
