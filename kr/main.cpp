@@ -64,21 +64,8 @@ int main() {
     }
     int n=0;
     simply_solve(s,t,n,proc);
-    check(s,t,n,proc);
-    for(int i=0; i<n; ++i) {
-        int type = (proc+i)->type;
-        if (type == 1) {
-            string S;
-            S = (proc+i)->S;
-            cout << 1 << " " << S << endl;
-        }
-        else {
-            int I,J;
-            I = (proc+i)->i;
-            J = (proc+i)->j;
-            cout << 2 << " " << I << " " << J << endl;
-        }
-    }
+//    check(s,t,n,proc);
+    output(1,n,proc);
 }
 
 void simply_solve(string s, string t, int& n, procedure *c) {
