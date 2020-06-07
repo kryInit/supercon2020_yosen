@@ -118,15 +118,6 @@ void solverUsingFactorization(string s, string t, int& n, procedure *c) {
     }
 }
 
-void aLittleWiseSolver(string s, string t, int &n, procedure *c) {
-    vector<procedure> v;
-    int scnt[A2Z_NUM]={}, tcnt[A2Z_NUM]={};
-    for(auto i : s) scnt[i-'a'];
-    for(auto i : t) tcnt[i-'a'];
-    vector<vector<int>> dp(MAX_T+1, vector<int>(A2Z_NUM+1, 0));
-
-}
-
 void simplySolve(string s, string t, int& n, procedure *c) {
     vector<procedure> v;
     int scnt[A2Z_NUM]={}, tcnt[A2Z_NUM]={};
