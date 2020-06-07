@@ -57,9 +57,10 @@ vector<procedure> lsort(string s);
 vector<procedure> rsort(string s);
 
 
-procedure proc[MAX_N];
 
 int main() {
+    procedure *proc;
+    proc = new procedure[MAX_N];
     string s,t;
     cin >> s >> t;
     if(isNoCase(s,t)) {
@@ -71,6 +72,8 @@ int main() {
 //    check(s,t,n,proc);
     output(1,n,proc);
 }
+
+
 
 void solverUsingFactorization(string s, string t, int& n, procedure *c) {
     int scnt[A2Z_NUM] = {}, tcnt[A2Z_NUM] = {};
@@ -98,14 +101,30 @@ void solverUsingFactorization(string s, string t, int& n, procedure *c) {
         }
     }
     simplySolve(s,mint,n,c);
-    for(int i=0; i<A2Z_NUM; ++i) if (times[i] && times[i] > 1) {
-        procedure tmp;
-        string S;
-        for(int k=0; k<=times[i]; ++k) S.push_back(i+'a');
-        tmp.init_type1(S);
-        *(c+n) = tmp;
-        ++n;
+    for(int i=0; i<A2Z_NUM; ++i) {
+        if (times[i] && times[i] > 1) {
+            vector<int> factor;
+            int tmp = times[i];
+            while(tmp%2 == 0) factor.push_back(2), tmp /= 2;
+            for(int i=3; tmp != 1; i+=2) while (tmp%i == 0) factor.push_back(i), tmp /= i;
+            auto f = [](int n, char c) { string tmps; for(int i=0; i<n; ++i) tmps.push_back(c); return tmps; };
+            for(auto j : factor) {
+                procedure tmp;
+                tmp.init_type1(f(j+1, i+'a'));
+                *(c+n) = tmp;
+                ++n;
+            }
+        }
     }
+}
+
+void aLittleWiseSolver(string s, string t, int &n, procedure *c) {
+    vector<procedure> v;
+    int scnt[A2Z_NUM]={}, tcnt[A2Z_NUM]={};
+    for(auto i : s) scnt[i-'a'];
+    for(auto i : t) tcnt[i-'a'];
+    vector<vector<int>> dp(MAX_T+1, vector<int>(A2Z_NUM+1, 0));
+
 }
 
 void simplySolve(string s, string t, int& n, procedure *c) {
@@ -336,7 +355,7 @@ void check(string s, string t, int n, procedure *c) {
             swap(s[i-1], s[j-1]);
             cost += j-i;
         }
-        if (s.size() > 200000) {
+        if (s.size() > MAX_S) {
             cout << "size of s exceeds 200,000!" << endl;
             return;
         }
