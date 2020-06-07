@@ -34,6 +34,10 @@ int main(int argc, char *argv[]) {
     long long min_cost = LONG_LONG_MAX;
 
     long long *_cost = new long long[argc];
+    if( _cost == 0x0 ) {
+      cout << "Insufficient memory" << endl;
+      return -1;
+   }
 
     for(int k=1; k<argc; ++k) {
         string cmd = string(argv[k]);
@@ -80,7 +84,7 @@ int main(int argc, char *argv[]) {
         cout << "minimum cost command is " + string(argv[idx_min_cost_cmd]) << endl;
         cout << "cost: " << min_cost << endl;
     }
-    delete _cost;
+    delete[] _cost;
 }
 
 const int MAX_N = 500000;
@@ -122,6 +126,10 @@ long long checkAndCalcCost(string filename_in, string filename_out) {
         else {
             int i,j;
             ifs_out >> i >> j;
+            if (min(i,j) < 1 || max(i,j) > s.size()) {
+                cout << "i or j is invaild value." << endl;
+                return -1;
+            }
             swap(s[i-1], s[j-1]);
             cost += j-i;
         }
