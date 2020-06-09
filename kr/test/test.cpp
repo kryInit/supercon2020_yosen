@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
             if (cost == -1) {
                 cout << "we have a bad news...\n your proguram is something wrong." << endl;
                 _cost[k] = -1;
-                continue;
+                goto BREAK;
             }
             else cout << "OK!\ncost: " << cost << endl;
             cout << "finished!\n" << endl;
@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
             idx_min_cost_cmd = k;
         }
         _cost[k] = sum_cost;
+        BREAK:;
     }
     if (idx_min_cost_cmd == 0) {
         cout << "all proguram is something wrong..." << endl;
@@ -76,7 +77,7 @@ int main(int argc, char *argv[]) {
         for(int k=1; k<argc; ++k) {
             if (_cost[k] != -1) {
                 cout << setw(16) << setfill('-') << string(argv[k]) << "'s cost: ";
-                cout << _cost[k] << endl;
+                cout << setw(10) << setfill(' ') <<  _cost[k] << endl;
             }
         }
         cout << endl;
