@@ -71,13 +71,18 @@ string getReducedT(string s, string t);
 vector<string> getLongAsgvEachChar(string s, string t);
 char getCharWithLongestAsg(vector<string> asgv);
 void deleteUnusedChar(string &s, vector<string> asgv, vector<procedure> &proc);
-void makeTheCharAsgPrev(char c, string &s, vector<procedure> &proc);
-void executeTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc);
-void executeOtherCharsAsgAndSorting(char c, string &s, vector<string> asgv, vector<procedure> &proc);
+void makeTheCharPrev(char c, string &s, vector<procedure> &proc);
+void execTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc);
+void execOtherCharsAsgAndSorting(char c, string &s, vector<string> asgv, vector<procedure> &proc);
 void upper2lower(string s, vector<procedure> &proc);
 void decodeT(string mint, string t, vector<procedure> &proc);
 
 int main() {
+    double time = 0;
+    chrono::system_clock::time_point start, end;
+    start = chrono::system_clock::now();
+
+
     int n=0;
     procedure *proc; proc = new procedure[MAX_N];
     string s,t; cin >> s >> t;
@@ -89,6 +94,11 @@ int main() {
 //    check(s,t,n,proc);
     output(1,n,proc);
     delete[] proc;
+
+
+    end = chrono::system_clock::now();
+    time = static_cast<double>(chrono::duration_cast<chrono::microseconds>(end - start).count() / 1000.0);
+    cerr << "time: " << time << "[ms]" << endl;
 }
 
 void solver(string s, string t, int &n, procedure *procp) {
@@ -99,11 +109,11 @@ void solver(string s, string t, int &n, procedure *procp) {
 
 
     deleteUnusedChar(s, asgv, proc);
-    makeTheCharAsgPrev(c, s, proc);
+    makeTheCharPrev(c, s, proc);
 
 
-    executeTheCharsAsgAndSorting(s, asgv[c-'a'], proc);
-    executeOtherCharsAsgAndSorting(c, s, asgv, proc);
+    execTheCharsAsgAndSorting(s, asgv[c-'a'], proc);
+    execOtherCharsAsgAndSorting(c, s, asgv, proc);
 
     upper2lower(s,proc);
     decodeT(mint,t,proc);
@@ -172,7 +182,7 @@ char getCharWithLongestAsg(vector<string> asgv) {
 
     return asgv[longest_asgs_idx].front();
 }
-void makeTheCharAsgPrev(char c, string &s, vector<procedure> &proc) {
+void makeTheCharPrev(char c, string &s, vector<procedure> &proc) {
     int cnt=0;
     deque<int> csidxes;
     for(int i=0; i<s.size(); ++i) if (s[i] == c) cnt++, csidxes.push_back(i);
@@ -191,7 +201,7 @@ void deleteUnusedChar(string &s, vector<string> asgv, vector<procedure> &proc) {
     for(auto i : s) if (asgv[i-'a'].size() > 1) tmps.push_back(i);
     s = tmps;
 }
-void executeTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc) {
+void execTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc) {
     // proc size increase is ((ccnt>>1)+1)*number_of_alphabet_types_in_s < MAX_N/2
     char c = asg.front();
     string S = asg.substr(1);
@@ -201,10 +211,8 @@ void executeTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc
     int ccnt = [=] () {int cnt=0; for(auto i : s) if (i==c) cnt++; return cnt; }();
 
 
-    if (minS.size() <= 1) {
-        proc.push_back(makeProc(minS));
-        for(int i=0; i<s.size(); ++i) if (s[i] == c) s[i] = minS.front();
-    } else {
+    if (minS.size() <= 1) proc.push_back(makeProc({c,minS.front()}));
+    else {
         for(int i=0; i<minS.size()-1; ++i) {
             if (i == minS.size()-2) proc.push_back(makeProc({c,minS[i],minS[i+1]}));
             else proc.push_back(makeProc({c,minS[i],c}));
@@ -231,7 +239,7 @@ void executeTheCharsAsgAndSorting(string &s, string asg, vector<procedure> &proc
     auto repeatc = [](int n, char c) {string result; for(int i=0; i<n; ++i) result.push_back(c); return result; };
     for(int i=0; i<A2Z_NUM; ++i) if (Scnt[i] != minScnt[i]) proc.push_back(makeProc(repeatc(Scnt[i]+1, (i+'A'))));
 }
-void executeOtherCharsAsgAndSorting(char c, string &s, vector<string> asgv, vector<procedure> &proc) {
+void execOtherCharsAsgAndSorting(char c, string &s, vector<string> asgv, vector<procedure> &proc) {
     for(auto asg : asgv) {
         if (asg.size() < 2 || asg.front() == c) continue;
         char ci = asg.front();
