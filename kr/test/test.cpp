@@ -129,6 +129,8 @@ long long checkAndCalcCost(string filename_in, string filename_out) {
             ifs_out >> i >> j;
             if (min(i,j) < 1 || max(i,j) > s.size()) {
                 cout << "i or j is invaild value." << endl;
+                cout << "line: " << i+3 << endl;
+                cout << "s.size(): " << s.size() << endl;
                 return -1;
             }
             swap(s[i-1], s[j-1]);
@@ -136,6 +138,7 @@ long long checkAndCalcCost(string filename_in, string filename_out) {
         }
         if (s.size() > 200000) {
             cout << "size of s exceeds 200,000." << endl;
+            cout << "line: " << i+3 << endl;
             return - 1;
         }
     }
