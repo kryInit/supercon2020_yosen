@@ -86,6 +86,8 @@ int main(int argc, char *argv[]) {
         cout << "cost: " << min_cost << endl;
     }
     delete[] _cost;
+    if (idx_min_cost_cmd == 0) return -1;
+    else return 0;
 }
 
 const int MAX_N = 500000;
