@@ -1,14 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-
-/**
- * 出力の各行に対応する操作の情報を表す。
- * type = 1 のとき、代入を表す。
- * この時、 S は代入の情報を表す。
- * type = 2 のとき、入れ替えを表す。
- * この時、 i 番目の文字と j 番目の文字を入れ替えることを表す。
- */
 struct procedure {
     int type;
     string S;
@@ -20,11 +12,6 @@ struct procedure {
 procedure makeProc(string S) { procedure tmp; tmp.init(S); return tmp; }
 procedure makeProc(int i, int j) { procedure tmp; tmp.init(i,j); return tmp; }
 
-/**
- * 答えが YES のとき yn = 1、 NO のとき yn = 0 で呼び出す。
- * n は操作の回数を表す。
- * c は操作の情報を持った procedure 型の配列。
- */
 void output(int yn, int n, struct procedure *c) {
     if (!yn) {
         printf("NO\n");
@@ -65,15 +52,6 @@ const int MAX_T = 100000;
 const int MAX_S = 200000;
 const int MAX_N = 500000;
 
-void check(string s, string t, int n, procedure *c);
-void check(string s, string t, int n, vector<procedure> c);
-void print(vector<procedure> proc) {
-    for(auto i : proc) {
-        if (i.type == 1) cout << 1 << " " << i.S << endl;
-        else cout << 2 << " "<< i.i << " " << i.j << endl;
-    }
-}
-
 
 bool isNoCase(string s, string t);
 void endecode(string s, string& t, vector<procedure>& decode);
@@ -82,12 +60,10 @@ void solver(string s, string t, vector<procedure>& proc);
 
 long long calcCost(vector<procedure> proc);
 
-int loopcnt=0;
-
 int main(){
-    string origin_t;
-    string s,t; cin >> s >> t;origin_t = t;
-    time_t start = clock();
+    clock_t start = clock();
+    initXs(time(NULL));
+    string s,t; cin >> s >> t;
     if(isNoCase(s,t)) {
         output(0,0,NULL);
         return 0;
@@ -95,8 +71,8 @@ int main(){
     vector<procedure> decode, proc;
     endecode(s,t,decode);
     long long now_min_cost = LONG_LONG_MAX;
-//    while((clock()-start) < (unsigned long)(9.0*CLOCKS_PER_SEC))
-    for(int i=0; i<2; ++i)
+
+    while((clock()-start) < (unsigned long)(9.0*CLOCKS_PER_SEC))
     {
         vector<procedure> tmp_proc;
         string shfls = s;
@@ -109,7 +85,6 @@ int main(){
             now_min_cost = cost;
             proc = tmp_proc;
         }
-        ++loopcnt;
     }
 
     int n=0;
@@ -118,13 +93,8 @@ int main(){
     for(const auto& i : decode) _proc[n] = i, ++n;
 
     output(1,n,_proc);
-//    check(s,origin_t,n,_proc);
 
     delete[] _proc;
-
-    double time = (double)((clock()-start)*1000)/CLOCKS_PER_SEC;
-    cerr << "time: " << time << "[ms]" << endl;
-    cerr << "Loop count: " << loopcnt << endl;
 }
 
 bool isNoCase(string s, string t) {
@@ -283,7 +253,6 @@ void solver(string s, string t, vector<procedure>& proc) {
     deleteUnusedChar(s, asgv, proc);
 
     if (kr(c,s,asgv,proc)) {
-        cerr << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" << endl;
         makeTheCharPrev(c, s, proc);
         execTheCharsAsgAndSorting(s, asgv[c-'a'], proc);
         execOtherCharsAsgAndSorting(c, s, asgv, proc);
@@ -624,84 +593,4 @@ vector<procedure> rsort(string s) {
     return result;
 }
 
-void check(string s, string t, int n, procedure *c) {
-    if (n > MAX_N) {
-        cout << "n is too large!" << endl;
-        return;
-    }
-    int cost=0,c1=0,c2=0;
-    for(procedure *proc = c; proc < (c+n); ++proc) {
-        int type = proc->type;
-        if (type == 1) {
-            char c = proc->S.front();
-            string S = proc->S.substr(1);
-            string tmps;
-            for(auto i : s) {
-                if (i == c) tmps += S;
-                else tmps.push_back(i);
-            }
-            s = tmps;
-            cost += proc->S.size();
-            c1 += proc->S.size();
-        }
-        else {
-            int i = proc->i, j = proc->j;
-            swap(s[i-1], s[j-1]);
-            cost += j-i;
-            c2 += j-i;
-        }
-        if (s.size() > MAX_S) {
-            cout << "size of s exceeds 200,000!" << endl;
-            return;
-        }
-    }
-    cout << "s: " << s << endl;
-    cout << "t: " << t << endl;
-    cout << "s == t: " << (s == t ? "true" : "false") << endl;
-    cout << "cost  : " << cost << " (" << c1 << ", " << c2 << ")" << endl;
-    {
-        int scnt[A2Z_NUM]={}, tcnt[A2Z_NUM]={};
-        for(auto i : s) scnt[i-'a']++;
-        for(auto i : t) tcnt[i-'a']++;
-        for(int i=0; i<A2Z_NUM; ++i) {
-            cout << (char)(i+'a') << ": " << scnt[i] << ", " << tcnt[i] << (scnt[i] == tcnt[i] ? "  (equal)" : "  (different)") << endl;
-        }
-    }
 
-}
-void check(string s, string t, int n, vector<procedure> c) {
-    if (n > MAX_N) {
-        cout << "n is too large!" << endl;
-        return;
-    }
-    int cost=0,c1=0,c2=0;
-    for(auto I : c) {
-        int type = I.type;
-        if (type == 1) {
-            char c = I.S.front();
-            string S = I.S.substr(1);
-            string tmps;
-            for(auto i : s) {
-                if (i == c) tmps += S;
-                else tmps.push_back(i);
-            }
-            s = tmps;
-            cost += I.S.size();
-            c1 += I.S.size();
-        }
-        else {
-            int i = I.i, j = I.j;
-            swap(s[i-1], s[j-1]);
-            cost += j-i;
-            c2 += j-i;
-        }
-        if (s.size() > MAX_S) {
-            cout << "size of s exceeds 200,000!" << endl;
-            return;
-        }
-    }
-    cout << "s: " << s << endl;
-    cout << "t: " << t << endl;
-    cout << "s == t: " << (s == t ? "true" : "false") << endl;
-    cout << "cost  : " << cost << " (" << c1 << ", " << c2 << ")" << endl;
-}
